@@ -1,0 +1,249 @@
+#Arnold Custom AOV version 1.0.0
+#For Maya. Tested in Maya 2014 &amp; 2015 with Arnold 4.2.9.0
+#Bryanna London <a class="vglnk" href="http://www.bryannalondon.com" rel="nofollow"><span>www</span><span>.</span><span>bryannalondon</span><span>.</span><span>com</span></a>
+#!/usr/bin/env python
+ 
+import maya.cmds as cmds
+ 
+def makeOcclusion():
+ 
+    #Create and Name AOV
+    occlusionAOV = cmds.createNode( 'aiAOV' , name= 'Occlusion' )
+    cmds.setAttr( occlusionAOV + '.name' , 'Occlusion' , type='string')
+    cmds.setAttr( occlusionAOV + '.type' , 5 )
+    #Basic AOV Connections
+    cmds.connectAttr( occlusionAOV + '.message' , 'defaultArnoldRenderOptions.aovList', nextAvailable=True )
+    cmds.connectAttr( 'defaultArnoldDriver.message' , occlusionAOV + '.outputs[0].driver' )
+    cmds.connectAttr( 'defaultArnoldFilter.message' , occlusionAOV + '.outputs[0].filter' )
+    #Create Occlusion Shader and Connect
+    occShader = cmds.createNode('aiAmbientOcclusion' , name = 'occMtl')
+    cmds.setAttr(occShader + '.falloff' , 1)
+    cmds.connectAttr(occShader + '.outColor' , occlusionAOV + '.defaultValue')
+ 
+def makeUV():
+ 
+    #Create and Name AOV
+    uvAOV = cmds.createNode( 'aiAOV' , name= 'UV' )
+    cmds.setAttr( uvAOV + '.name' , 'UV' , type='string')
+    cmds.setAttr( uvAOV + '.type' , 5 )
+    #Basic AOV Connections
+    cmds.connectAttr( uvAOV + '.message' , 'defaultArnoldRenderOptions.aovList', nextAvailable=True )
+    cmds.connectAttr( 'defaultArnoldDriver.message' , uvAOV + '.outputs[0].driver' )
+    cmds.connectAttr( 'defaultArnoldFilter.message' , uvAOV + '.outputs[0].filter' )
+    #Create UV Shader
+    uvShader = cmds.createNode('surfaceShader', name = 'uvMtl')
+    #create Average Node
+    plusNode = cmds.shadingNode('plusMinusAverage', asUtility = True)
+    #Create U ramp
+    uramp = cmds.shadingNode('ramp', asTexture = True)
+    uRamp = cmds.rename(uramp, 'uRamp')
+    cmds.setAttr(uRamp + '.type', 1)
+    cmds.setAttr(uRamp + '.colorEntryList[0].color', 0,0,0, type = 'double3')
+    cmds.setAttr(uRamp + '.colorEntryList[1].position', 1)
+    cmds.setAttr(uRamp + '.colorEntryList[1].color', 1,0,0, type = 'double3')
+    place2dTextureNode = cmds.shadingNode('place2dTexture', asUtility = True)
+    cmds.connectAttr(place2dTextureNode + '.outUV', uRamp + '.uvCoord')
+    cmds.connectAttr(place2dTextureNode + '.outUvFilterSize', uRamp + '.uvFilterSize')
+    #create V Ramp
+    vramp = cmds.shadingNode('ramp', asTexture = True)
+    vRamp = cmds.rename(vramp, 'vRamp')
+    cmds.setAttr(vRamp + '.type', 0)
+    cmds.setAttr(vRamp + '.colorEntryList[0].color', 0,0,0, type = 'double3')
+    cmds.setAttr(vRamp + '.colorEntryList[1].position', 1)
+    cmds.setAttr(vRamp + '.colorEntryList[1].color', 0,1,0, type = 'double3')
+    place2dTextureNode = cmds.shadingNode('place2dTexture', asUtility = True)
+    cmds.connectAttr(place2dTextureNode + '.outUV', vRamp + '.uvCoord')
+    cmds.connectAttr(place2dTextureNode + '.outUvFilterSize', vRamp + '.uvFilterSize')
+    #Attach ramps to average node
+    cmds.connectAttr(uRamp + '.outColor', plusNode + '.input3D[0]')
+    cmds.connectAttr(vRamp + '.outColor', plusNode + '.input3D[1]')
+    #Connect Average to Surface Shader
+    cmds.connectAttr(plusNode + '.output3D' , uvShader + '.outColor')
+    #Connect to AOV
+    cmds.connectAttr(uvShader + '.outColor' , uvAOV + '.defaultValue')
+ 
+def makeNrm():
+ 
+    #Create and Name AOV
+    nrmAOV = cmds.createNode( 'aiAOV' , name= 'Normal' )
+    cmds.setAttr( nrmAOV + '.name' , 'Normal' , type='string')
+    cmds.setAttr( nrmAOV + '.type' , 5 )
+    #Basic AOV Connections
+    cmds.connectAttr( nrmAOV + '.message' , 'defaultArnoldRenderOptions.aovList', nextAvailable=True )
+    cmds.connectAttr( 'defaultArnoldDriver.message' , nrmAOV + '.outputs[0].driver' )
+    cmds.connectAttr( 'defaultArnoldFilter.message' , nrmAOV + '.outputs[0].filter' )
+    #Create Shader and Connect
+    nrmShader = cmds.createNode('aiUtility' , name= 'nrmMtl')
+    cmds.setAttr(nrmShader + '.shadeMode' , 2)
+    cmds.setAttr(nrmShader + '.colorMode' , 3)
+    cmds.connectAttr(nrmShader + '.outColor' , nrmAOV + '.defaultValue')
+ 
+def makeRGBNoise():
+ 
+    #Create and Name AOV
+    noiseAOV = cmds.createNode( 'aiAOV' , name= 'RGB_Noise' )
+    cmds.setAttr( noiseAOV + '.name' , 'RGB_Noise' , type='string')
+    cmds.setAttr( noiseAOV + '.type' , 5 )
+    #Basic AOV Connections
+    cmds.connectAttr( noiseAOV + '.message' , 'defaultArnoldRenderOptions.aovList', nextAvailable=True )
+    cmds.connectAttr( 'defaultArnoldDriver.message' , noiseAOV + '.outputs[0].driver' )
+    cmds.connectAttr( 'defaultArnoldFilter.message' , noiseAOV + '.outputs[0].filter' )
+    #create red fractal texture
+    redFractal = cmds.shadingNode('fractal', name = 'redFractal', asTexture = True)
+    #connect place2Dtexture node
+    redPlace2dTextureNode = cmds.shadingNode('place2dTexture', asUtility = True)
+    cmds.connectAttr(redPlace2dTextureNode + '.outUV' , redFractal + '.uvCoord')
+    cmds.connectAttr(redPlace2dTextureNode + '.outUvFilterSize' , redFractal + '.uvFilterSize')
+    #make red and smaller
+    cmds.setAttr(redFractal + '.colorGain' , 1, 0, 0, type = 'double3')
+    cmds.setAttr(redFractal + '.alphaIsLuminance', 1)
+    cmds.setAttr(redPlace2dTextureNode + '.repeatU', 2)
+    cmds.setAttr(redPlace2dTextureNode + '.repeatV', 2)
+    #green fractal
+    greenFractal = cmds.shadingNode('fractal', name = 'greenFractal', asTexture = True)
+    #connect place2Dtexture node
+    greenPlace2dTextureNode = cmds.shadingNode('place2dTexture', asUtility = True)
+    cmds.connectAttr(greenPlace2dTextureNode + '.outUV' , greenFractal + '.uvCoord')
+    cmds.connectAttr(greenPlace2dTextureNode + '.outUvFilterSize' , greenFractal + '.uvFilterSize')
+    #make red and smaller
+    cmds.setAttr(greenFractal + '.colorGain' , 0, 1, 0, type = 'double3')
+    cmds.setAttr(greenFractal + '.alphaIsLuminance', 1)
+    cmds.setAttr(greenPlace2dTextureNode + '.repeatU', .8)
+    cmds.setAttr(greenPlace2dTextureNode + '.repeatV', .8)
+    #blue fractal
+    blueFractal = cmds.shadingNode('fractal', name = 'blueFractal', asTexture = True)
+    #connect place2Dtexture node
+    bluePlace2dTextureNode = cmds.shadingNode('place2dTexture', asUtility = True)
+    cmds.connectAttr(bluePlace2dTextureNode + '.outUV' , blueFractal + '.uvCoord')
+    cmds.connectAttr(bluePlace2dTextureNode + '.outUvFilterSize' , blueFractal + '.uvFilterSize')
+    #make red and smaller
+    cmds.setAttr(blueFractal + '.colorGain' , 0, 0, 1, type = 'double3')
+    cmds.setAttr(blueFractal + '.alphaIsLuminance', 1)
+    cmds.setAttr(bluePlace2dTextureNode + '.repeatU', 10)
+    cmds.setAttr(bluePlace2dTextureNode + '.repeatV', 10)
+    #create blendColors and connect three fractals
+    blendColorsRG = cmds.shadingNode('blendColors', name = 'blendColorsRG', asUtility = True)
+    cmds.connectAttr(redFractal + '.outColor' , blendColorsRG + '.color1')
+    cmds.connectAttr(greenFractal + '.outColor' , blendColorsRG + '.color2')
+    blendColorsRGB = cmds.shadingNode('blendColors', name = 'blendColorsRGB', asUtility = True)
+    cmds.connectAttr(blendColorsRG + '.output' , blendColorsRGB + '.color1')
+    cmds.connectAttr(blueFractal + '.outColor' , blendColorsRGB + '.color2')
+    #Create Shader and Connect
+    noiseShader = cmds.createNode('surfaceShader', name = 'noiseMtl')
+    cmds.connectAttr(blendColorsRGB + '.output' , noiseShader + '.outColor')
+    cmds.connectAttr(noiseShader + '.outColor' , noiseAOV + '.defaultValue')
+ 
+def makeWireframe():
+ 
+    #Create and Name AOV
+    wireAOV = cmds.createNode( 'aiAOV' , name= 'Wireframe' )
+    cmds.setAttr( wireAOV + '.name' , 'Wireframe' , type='string')
+    cmds.setAttr( wireAOV + '.type' , 5 )
+    #Basic AOV Connections
+    cmds.connectAttr( wireAOV + '.message' , 'defaultArnoldRenderOptions.aovList', nextAvailable=True )
+    cmds.connectAttr( 'defaultArnoldDriver.message' , wireAOV + '.outputs[0].driver' )
+    cmds.connectAttr( 'defaultArnoldFilter.message' , wireAOV + '.outputs[0].filter' )
+    #Create Shader and Connect
+    wireShader = cmds.createNode('aiWireframe', name = 'wireframeMtl')
+    cmds.setAttr(wireShader + '.edgeType' , 1)
+    cmds.connectAttr(wireShader + '.outColor' , wireAOV + '.defaultValue')
+ 
+def makeRimLight():
+ 
+    #Create and Name AOV
+    rimAOV = cmds.createNode( 'aiAOV' , name= 'Rim_Light' )
+    cmds.setAttr( rimAOV + '.name' , 'Rim_Light' , type='string')
+    cmds.setAttr( rimAOV + '.type' , 5 )
+    #Basic AOV Connections
+    cmds.connectAttr( rimAOV + '.message' , 'defaultArnoldRenderOptions.aovList', nextAvailable=True )
+    cmds.connectAttr( 'defaultArnoldDriver.message' , rimAOV + '.outputs[0].driver' )
+    cmds.connectAttr( 'defaultArnoldFilter.message' , rimAOV + '.outputs[0].filter' )
+    #Create Ramp and sampler info
+    ramp = cmds.shadingNode('ramp', name = 'rimLight_ramp', asTexture = True)
+    samplerInfo = cmds.shadingNode('samplerInfo', asUtility = True)
+    #set ramp up
+    cmds.setAttr(ramp + '.colorEntryList[2].position', .485)
+    cmds.setAttr(ramp + '.colorEntryList[2].color', 0, 0, 0, type = 'double3')
+    cmds.setAttr(ramp + '.colorEntryList[1].position', .100)
+    cmds.setAttr(ramp + '.colorEntryList[1].color', .85, .8, .75, type = 'double3')
+    cmds.setAttr(ramp + '.colorEntryList[0].position', 0)
+    cmds.setAttr(ramp + '.colorEntryList[0].color', .94, .92, .9, type = 'double3')
+    #connect sampler info to ramp
+    cmds.connectAttr(samplerInfo + '.facingRatio', ramp + '.uCoord')
+    cmds.connectAttr(samplerInfo + '.facingRatio', ramp + '.vCoord')
+    #Create Shader and Connect
+    rimShader = cmds.createNode('surfaceShader' , name = 'rimMtl')
+    cmds.connectAttr(ramp + '.outColor' , rimShader + '.outColor' )
+    cmds.connectAttr(ramp+ '.outColor' , rimAOV + '.defaultValue')
+ 
+def makeObjectId():
+ 
+    #Create and Name AOV
+    objIdAOV = cmds.createNode( 'aiAOV' , name= 'Object_ID' )
+    cmds.setAttr( objIdAOV + '.name' , 'Object_ID' , type='string')
+    cmds.setAttr( objIdAOV + '.type' , 5 )
+    #Basic AOV Connections
+    cmds.connectAttr( objIdAOV + '.message' , 'defaultArnoldRenderOptions.aovList', nextAvailable=True )
+    cmds.connectAttr( 'defaultArnoldDriver.message' , objIdAOV + '.outputs[0].driver' )
+    cmds.connectAttr( 'defaultArnoldFilter.message' , objIdAOV + '.outputs[0].filter' )
+    #Create Shader and Connect
+    objShader = cmds.createNode('aiUtility' , name = 'objId_Mtl')
+    cmds.setAttr(objShader + '.shadeMode' , 2)
+    cmds.setAttr(objShader + '.colorMode' , 21)
+    cmds.connectAttr(objShader + '.outColor' , objIdAOV + '.defaultValue')
+ 
+#delete window if a window already exisits
+if cmds.window('aovWindow', exists=True):
+    cmds.deleteUI('aovWindow')
+ 
+#Create my GUI
+def createGUI():
+    #window set up
+    aovWindow = cmds.window('aovWindow',title=&quot;Custom Render Elements&quot;, rtf=True)
+    cmds.columnLayout(adjustableColumn= True, rowSpacing= 3)
+    cmds.checkBox('nrmAOV',label= &quot;Normal&quot;, value=True)
+    cmds.checkBox('occlusionAOV',label= &quot;Occlusion&quot;, value=True)
+    cmds.checkBox('uvAOV',label= &quot;UV&quot;, value=True)
+    cmds.checkBox('objIdAOV',label= &quot;Object ID&quot;, value=True)
+    cmds.checkBox('rimLightAOV',label= &quot;Rim Light&quot;, value=True)
+    cmds.checkBox('rgbNoiseAOV',label= &quot;RGB Noise&quot;, value=True)
+    cmds.checkBox('wireframeAOV',label= &quot;Wireframe&quot;, value=True)
+    cmds.button( label='Run', width= 224, command=('queryValues()'))
+    cmds.setParent('..')
+    cmds.setParent('..')
+    cmds.showWindow('aovWindow')
+ 
+#query checkboxes
+def queryValues():
+ 
+    nrmValue= cmds.checkBox('nrmAOV', query = True, value = True)
+    ocValue = cmds.checkBox('occlusionAOV', query = True, value = True)
+    uvValue = cmds.checkBox('uvAOV', query = True, value = True)
+    objIDValue = cmds.checkBox('objIdAOV', query = True, value = True)
+    rimValue = cmds.checkBox('rimLightAOV', query = True, value = True)
+    noiseValue = cmds.checkBox('rgbNoiseAOV', query = True, value = True)
+    wireframeValue= cmds.checkBox('wireframeAOV', query = True, value = True)
+    #if query is true create the render element
+    if nrmValue == True:
+        makeNrm()
+ 
+    if ocValue == True:
+        makeOcclusion()
+ 
+    if uvValue == True:
+        makeUV()
+ 
+    if objIDValue == True:
+        makeObjectId()    
+ 
+    if rimValue == True:
+        makeRimLight()
+ 
+    if noiseValue == True:
+        makeRGBNoise()
+ 
+    if wireframeValue == True:
+        makeWireframe()
+ 
+#Run the Script
+createGUI()
