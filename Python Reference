@@ -1,0 +1,202 @@
+	
+print
+
+print 'hello'
+print "hello hello"
+print """hello hello hello"""
+print """hello -
+    hello hello"""
+pi = 3.14159
+print 'pi is %f' % pi
+print '2pi is %f' % (pi * 2)
+print 'pi is %f 2pi is %f' % (pi,pi*2)   
+print 'pi is %1.3f' % pi
+single quotations
+double quotations
+triple quotations
+triple quotations can span multiple lines of text 
+variable assignment
+print a single variable
+print + arithmetic
+print multiple values
+formatting ie. "pi is 3.142"
+
+
+setting variables
+
+pi = 3.14159
+age = 21
+numAsStr = '32'
+num = int(numAsStr)
+pi is assigned as a float
+age is assigned as an integer
+numAsStr is assigned as a string
+the int() function converts a numeric string to an integer
+
+
+if-elif-else
+
+padding = ""
+val = 43
+if val < 10:
+    padding = '000%d' % val
+elif val < 100:
+    padding = '00%d' % val
+else:
+    padding = '0%d' % val
+if not padding == "":
+    print padding
+the code shown on the left creates a numeric string with 4 padding digits, for example, 43 becomes "0043" 
+
+
+
+
+
+example of a "not-equal-to" test
+
+
+for loops
+
+from sys import stdout as out
+columns = 3
+rows = 4
+for i in range(columns):
+    for j in range(rows):
+        out.write('%d%d '%(i+1, j+1))   
+        if j == 3:
+            print ''
+
+pets = ['cat','dog','fish']
+for pet in pets:
+    print pet
+
+
+the output of the nested "for" loops is,
+    11 12 13 14
+    21 22 23 24
+    31 32 33 34
+note the use of the write() function 
+insert a newline
+
+printing each item in the list
+
+Using Strings
+
+english = 'Hello'
+italian = "Ciao"
+siswati = """sawubona"""
+go = 'hamba'
+well = 'kahle'
+farewell = go + ' ' + well
+farewell = 'hamba' ' ' 'kahle'
+print('num chars is %d') % len(farewell)    
+siswati = 'Khisimusi Lomuhle'
+merry = siswati[10:]
+christmas = siswati[:9]
+christmas[10] = 'l'
+christmas = 'Khisimusi lomuhle'
+single quotations
+double quotations
+triple quotations
+assign two string variables
+
+concatenating string variables
+concatenating string literals
+querying the length of a string
+
+slicing - from the 10th char
+slicing - upto the 9th char
+error - cannot change individual chars
+but the entire string can be re-assigned
+
+Other String Methods [docs]
+
+ 	
+txt = "Pixar's Renderman"
+txt.find('man')
+txt.replace('man', 'Man')
+txt.capitalize()
+txt.upper()
+txt.lower()
+txt.isalpha()
+txt.split() # returns "Pixar's" and "RenderMan"
+txt * 4 # repeat four times
+txt.lstrip("Pixar's ") # remove "Pixar's "
+txt.rstrip(' Renderman') # remove "Renderman "
+txt.endswith('n')
+txt.startswith('P')
+txt.isdigit()
+
+Using Lists
+
+places = []
+places.append('germany')
+places.append('swaziland')
+places.append('france')
+places.extend(['italy','usa','brazil'])    
+print places[0]
+print '%d places' % (len(places))
+places.sort()
+print places[len(places)-2:]
+europe = places[1:4]
+print europe
+create an empty list
+add items one at a time
+
+
+add several items
+print the first item
+print the size of the list
+sort the list alphabetically
+print the last two items
+copy a sliced portion of a list
+Other List Methods [docs]
+
+ 	
+lst = ["Pixar's", 'RenderMan']
+lst.insert(0, 'Using')
+lst.remove('RenderMan') # deletes "RenderMan"
+lst.pop(0) # deletes and returns 'Using'
+lst.index("Pixar's")
+lst.reverse()
+
+Using Dictionaries
+
+lut = {'color space': 'rgb', 
+        'orange': [1.0, 0.4, 0.2],
+        'purple': [0.6, 0.0, 0.6]}
+items = [('color space', 'rgb'), 
+         ('orange', [1.0, 0.4, 0.2]), 
+         ('purple', [0.6, 0.0, 0.6])]
+lut = dict(items)
+print lut['color space']
+print lut['orange']
+  
+if not lut.has_key('blue'):
+    print 'no blue'
+if 'blue' not in lut:
+    print 'no blue'
+print lut.keys()
+print lut.values()
+  
+  
+  
+print len(lut)
+r,g,b = lut['orange']
+print '%1.3f,%1.3f,%1.3f' % (r,g,b)  
+lut['purple'] = [1.0,0.2,0.8]
+define a simple color lookup table
+
+
+rgb
+[1.0, 0.40000000000000002, 0.20000000000000001]
+
+no blue
+
+no blue
+['orange', 'purple', 'color space']
+[[1.0, 0.40000000000000002, 0.20000000000000001], [0.59999999999999998, 0.0, 0.59999999999999998], 'rgb']
+3
+get the rgb components
+1.000, 0.400, 0.200
+assign new values to "purple"
