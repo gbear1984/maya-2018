@@ -1,8 +1,3 @@
-#Arnold Custom AOV version 1.0.0
-#For Maya. Tested in Maya 2014 &amp; 2015 with Arnold 4.2.9.0
-#Bryanna London <a class="vglnk" href="http://www.bryannalondon.com" rel="nofollow"><span>www</span><span>.</span><span>bryannalondon</span><span>.</span><span>com</span></a>
-#!/usr/bin/env python
- 
 import maya.cmds as cmds
  
 def makeOcclusion():
@@ -199,15 +194,15 @@ if cmds.window('aovWindow', exists=True):
 #Create my GUI
 def createGUI():
     #window set up
-    aovWindow = cmds.window('aovWindow',title=&quot;Custom Render Elements&quot;, rtf=True)
+    aovWindow = cmds.window('aovWindow',title="Custom Render Elements", rtf=True)
     cmds.columnLayout(adjustableColumn= True, rowSpacing= 3)
-    cmds.checkBox('nrmAOV',label= &quot;Normal&quot;, value=True)
-    cmds.checkBox('occlusionAOV',label= &quot;Occlusion&quot;, value=True)
-    cmds.checkBox('uvAOV',label= &quot;UV&quot;, value=True)
-    cmds.checkBox('objIdAOV',label= &quot;Object ID&quot;, value=True)
-    cmds.checkBox('rimLightAOV',label= &quot;Rim Light&quot;, value=True)
-    cmds.checkBox('rgbNoiseAOV',label= &quot;RGB Noise&quot;, value=True)
-    cmds.checkBox('wireframeAOV',label= &quot;Wireframe&quot;, value=True)
+    cmds.checkBox('nrmAOV',label="Normal", value=True)
+    cmds.checkBox('occlusionAOV',label="Occlusion", value=True)
+    cmds.checkBox('uvAOV',label="UV", value=True)
+    cmds.checkBox('objIdAOV',label="Object ID", value=True)
+    cmds.checkBox('rimLightAOV',label="Rim Light", value=True)
+    cmds.checkBox('rgbNoiseAOV',label="RGB Noise", value=True)
+    cmds.checkBox('wireframeAOV',label="Wireframe", value=True)
     cmds.button( label='Run', width= 224, command=('queryValues()'))
     cmds.setParent('..')
     cmds.setParent('..')
@@ -247,3 +242,4 @@ def queryValues():
  
 #Run the Script
 createGUI()
+
