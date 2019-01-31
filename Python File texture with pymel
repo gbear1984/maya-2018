@@ -1,0 +1,29 @@
+import pymel.core as pm
+
+def createFileTexture(fileTextureName, p2dName):
+    tex = pm.shadingNode('file', name=fileTextureName, asTexture=True, isColorManaged=True)
+    if not pm.objExists(p2dName):
+        pm.shadingNode('place2dTexture', name=p2dName, asUtility=True)
+    p2d = pm.PyNode(p2dName)
+    tex.filterType.set(0)
+    pm.connectAttr(p2d.outUV, tex.uvCoord)
+    pm.connectAttr(p2d.outUvFilterSize, tex.uvFilterSize)
+    pm.connectAttr(p2d.vertexCameraOne, tex.vertexCameraOne)
+    pm.connectAttr(p2d.vertexUvOne, tex.vertexUvOne)
+    pm.connectAttr(p2d.vertexUvThree, tex.vertexUvThree)
+    pm.connectAttr(p2d.vertexUvTwo, tex.vertexUvTwo)
+    pm.connectAttr(p2d.coverage, tex.coverage)
+    pm.connectAttr(p2d.mirrorU, tex.mirrorU)
+    pm.connectAttr(p2d.mirrorV, tex.mirrorV)
+    pm.connectAttr(p2d.noiseUV, tex.noiseUV)
+    pm.connectAttr(p2d.offset, tex.offset)
+    pm.connectAttr(p2d.repeatUV, tex.repeatUV)
+    pm.connectAttr(p2d.rotateFrame, tex.rotateFrame)
+    pm.connectAttr(p2d.rotateUV, tex.rotateUV)
+    pm.connectAttr(p2d.stagger, tex.stagger)
+    pm.connectAttr(p2d.translateFrame, tex.translateFrame)
+    pm.connectAttr(p2d.wrapU, tex.wrapU)
+    pm.connectAttr(p2d.wrapV, tex.wrapV)
+    return tex
+    
+createFileTexture('fileOne', 'p2dOne')
