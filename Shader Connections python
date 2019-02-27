@@ -1,0 +1,16 @@
+name_of_shader= 'lamber2'
+plugInfo={}
+
+inputPlugs = cmds.listConnections(name_of_shader, plugs=True, destination=False, source=True)
+
+for connectionPlug in inputPlugs:
+
+    destanationPlug = cmds.listConnections(connectionPlug, plugs=True, source=True)[0]  
+
+    print connectionPlug + ' is connect to ---> ' + destanationPlug
+
+    plugInfo[connectionPlug] = destanationPlug
+
+
+print plugInfo
+
