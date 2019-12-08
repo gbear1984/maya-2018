@@ -1,0 +1,20 @@
+import pymel.core as pm
+import os
+
+def remap_selected_texture(z_path):
+    # figure out what's selected
+    selected = pm.ls(sl=True)
+    for item in selected:
+        test_path = pm.getAttr("%s.ftn" % item)
+        if 'Z:' not in test_path:
+            second = test_path.split('cartoon_room')[-1]
+            second = second.replace('//', '')
+            new_path = os.path.join(z_path, 'cartoon_room', second)
+            if os.path.exists(new_path):
+                print '%s is a valid file, remapping texture path!' % new_path
+                pm.setAttr('%s.ftn' % item, new_path)
+            else:
+                print '%s not valid' % new_path
+
+
+remap_selected_texture()
